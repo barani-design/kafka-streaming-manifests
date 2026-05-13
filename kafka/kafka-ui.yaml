@@ -1,0 +1,115 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kafka-ui
+  namespace: kafka
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kafka-ui
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: kafka-ui
+      namespace: kafka
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: workload
+                    operator: In
+                    values:
+                      - kafka-master
+      containers:
+        - env:
+            - name: AUTH_TYPE
+              value: LOGIN_FORM
+            - name: SPRING_SECURITY_USER_NAME
+              valueFrom:
+                secretKeyRef:
+                  key: username
+                  name: kafka-ui-auth
+            - name: SPRING_SECURITY_USER_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: password
+                  name: kafka-ui-auth
+            - name: KAFKA_CLUSTERS_0_NAME
+              value: kafka-kraft
+            - name: KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS
+              value: kafka-kraft-kafka-bootstrap.kafka.svc:9092
+            - name: KAFKA_CLUSTERS_0_PROPERTIES_SECURITY_PROTOCOL
+              value: SASL_PLAINTEXT
+            - name: KAFKA_CLUSTERS_0_PROPERTIES_SASL_MECHANISM
+              value: SCRAM-SHA-512
+            - name: KAFKA_CLUSTERS_0_PROPERTIES_SASL_JAAS_CONFIG
+              valueFrom:
+                secretKeyRef:
+                  key: sasl.jaas.config
+                  name: kafka-kraft-user
+                  optional: false
+            - name: KAFKA_CLUSTERS_0_SCHEMAREGISTRY
+              value: http://schema-registry.kafka.svc:8081
+            - name: KAFKA_CLUSTERS_0_KSQLDBSERVER
+              value: http://ksqldb.kafka.svc:8088
+          image: kafbat/kafka-ui:latest
+          imagePullPolicy: IfNotPresent
+          name: kafka-ui
+          ports:
+            - containerPort: 8080
+              name: 8080tcp
+              protocol: TCP
+          resources:
+            limits:
+              cpu: 250m
+              memory: 512Mi
+            requests:
+              cpu: 100m
+              memory: 200Mi
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kafka-ui
+  namespace: kafka
+spec:
+  ports:
+    - name: 8080tcp
+      port: 8080
+      protocol: TCP
+      targetPort: 8080
+  selector:
+    app: kafka-ui
+  type: ClusterIP
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: kafka-ui
+  namespace: kafka
+  annotations:
+    acme.cert-manager.io/http01-edit-in-place: 'true'
+    cert-manager.io/cluster-issuer: letsencrypt
+    cert-manager.io/issue-temporary-certificate: 'true'
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: kafka-ui.example.com
+      http:
+        paths:
+          - path: /
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: kafka-ui
+                port:
+                  number: 8080
+  tls:
+    - hosts:
+        - kafka-ui.example.com
+      secretName: kafka-ui-tls

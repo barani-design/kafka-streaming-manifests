@@ -1,0 +1,36 @@
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaBridge
+metadata:
+  name: kafka-bridge
+  namespace: kafka
+  labels:
+    app: kafka-bridge
+spec:
+  authentication:
+    passwordSecret:
+      password: password
+      secretName: kafka-kraft-user
+    type: scram-sha-512
+    username: kafka-kraft-user
+  bootstrapServers: kafka-kraft-kafka-bootstrap.kafka.svc:9092
+  http:
+    port: 8087
+  replicas: 1
+  resources:
+    limits:
+      cpu: 250m
+      memory: 256Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+  template:
+    pod:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: workload
+                    operator: In
+                    values:
+                      - kafka-stream

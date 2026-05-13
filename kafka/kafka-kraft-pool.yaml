@@ -1,0 +1,38 @@
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaNodePool
+metadata:
+  labels:
+    strimzi.io/cluster: kafka-kraft
+  name: kafka-kraft-pool
+  namespace: kafka
+spec:
+  jvmOptions:
+    '-Xms': 1100m
+    '-Xmx': 1100m
+  replicas: 5
+  resources:
+    limits:
+      cpu: '1'
+      memory: 2000Mi
+    requests:
+      cpu: '1'
+      memory: 2000Mi
+  roles:
+    - controller
+    - broker
+  storage:
+    class: standard
+    deleteClaim: true
+    size: 20Gi
+    type: persistent-claim
+  template:
+    pod:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: workload
+                    operator: In
+                    values:
+                      - kafka-broker

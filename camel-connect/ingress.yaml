@@ -1,0 +1,107 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    acme.cert-manager.io/http01-edit-in-place: 'true'
+    cert-manager.io/cluster-issuer: letsencrypt
+    cert-manager.io/issue-temporary-certificate: 'true'
+    nginx.ingress.kubernetes.io/auth-realm: Authentication Required - webhook-basic-auth
+    nginx.ingress.kubernetes.io/auth-secret: webhook-basic-auth
+    nginx.ingress.kubernetes.io/auth-type: basic
+  name: camel-connect-webhook-vendor-a
+  namespace: kafka
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: camel-connect-webhook.example.com
+      http:
+        paths:
+          - backend:
+              service:
+                name: camel-connect-webhook-vendor-a-service
+                port:
+                  number: 61003
+            path: /webhook-vendor-a
+            pathType: Prefix
+  tls:
+    - hosts:
+        - camel-connect-webhook.example.com
+      secretName: camel-connect-vendor-a-tls
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    acme.cert-manager.io/http01-edit-in-place: 'true'
+    cert-manager.io/cluster-issuer: letsencrypt
+    cert-manager.io/issue-temporary-certificate: 'true'
+  name: camel-connect-webhook-vendor-b
+  namespace: kafka
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: camel-connect-webhook-vendor-b.example.com
+      http:
+        paths:
+          - backend:
+              service:
+                name: camel-connect-webhook-vendor-b-events-service
+                port:
+                  number: 61004
+            path: /webhook-vendor-b-events
+            pathType: Prefix
+          - backend:
+              service:
+                name: camel-connect-webhook-vendor-b-telemetry-service
+                port:
+                  number: 61005
+            path: /webhook-vendor-b-telemetry
+            pathType: Prefix
+  tls:
+    - hosts:
+        - camel-connect-webhook-vendor-b.example.com
+      secretName: camel-connect-vendor-b-tls
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    acme.cert-manager.io/http01-edit-in-place: 'true'
+    cert-manager.io/cluster-issuer: letsencrypt
+    cert-manager.io/issue-temporary-certificate: 'true'
+    nginx.ingress.kubernetes.io/auth-realm: Authentication Required - webhook-basic-auth
+    nginx.ingress.kubernetes.io/auth-secret: webhook-basic-auth
+    nginx.ingress.kubernetes.io/auth-type: basic
+  name: camel-connect-webhook-tti
+  namespace: kafka
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: camel-connect-webhook.example.com
+      http:
+        paths:
+          - backend:
+              service:
+                name: camel-connect-webhook-tti-region-a-service
+                port:
+                  number: 61000
+            path: /webhook-lorawan-tti-region-a
+            pathType: Prefix
+          - backend:
+              service:
+                name: camel-connect-webhook-tti-region-b-service
+                port:
+                  number: 61001
+            path: /webhook-lorawan-tti-region-b
+            pathType: Prefix
+          - backend:
+              service:
+                name: camel-connect-webhook-tti-region-c-service
+                port:
+                  number: 61002
+            path: /webhook-lorawan-tti-region-c
+            pathType: Prefix
+  tls:
+    - hosts:
+        - camel-connect-webhook.example.com
+      secretName: camel-connect-tti-tls

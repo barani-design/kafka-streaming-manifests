@@ -1,0 +1,29 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: schema-registry
+  namespace: kafka
+  annotations:
+    acme.cert-manager.io/http01-edit-in-place: 'true'
+    cert-manager.io/cluster-issuer: letsencrypt
+    cert-manager.io/issue-temporary-certificate: 'true'
+    nginx.ingress.kubernetes.io/auth-realm: Authentication Required - schema-registry
+    nginx.ingress.kubernetes.io/auth-secret: schema-registry-basic-auth
+    nginx.ingress.kubernetes.io/auth-type: basic
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: schema-registry.example.com
+      http:
+        paths:
+          - path: /
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: schema-registry
+                port:
+                  number: 8081
+  tls:
+    - hosts:
+        - schema-registry.example.com
+      secretName: schema-registry-tls

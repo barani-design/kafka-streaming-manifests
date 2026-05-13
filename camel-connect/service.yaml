@@ -1,0 +1,105 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: camel-connect-webhook-tti-region-a-service
+  namespace: kafka
+spec:
+  ports:
+    - name: webhook-lorawan-tti-region-a
+      port: 61000
+      protocol: TCP
+      targetPort: 61000
+  selector:
+    strimzi.io/cluster: camel-connect-cluster
+    strimzi.io/kind: KafkaConnect
+    strimzi.io/name: camel-connect-cluster-connect
+  sessionAffinity: None
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: camel-connect-webhook-tti-region-b-service
+  namespace: kafka
+spec:
+  ports:
+    - name: webhook-lorawan-tti-region-b
+      port: 61001
+      protocol: TCP
+      targetPort: 61001
+  selector:
+    strimzi.io/cluster: camel-connect-cluster
+    strimzi.io/kind: KafkaConnect
+    strimzi.io/name: camel-connect-cluster-connect
+  sessionAffinity: None
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: camel-connect-webhook-tti-region-c-service
+  namespace: kafka
+spec:
+  ports:
+    - name: webhook-lorawan-tti-region-c
+      port: 61002
+      protocol: TCP
+      targetPort: 61002
+  selector:
+    strimzi.io/cluster: camel-connect-cluster
+    strimzi.io/kind: KafkaConnect
+    strimzi.io/name: camel-connect-cluster-connect
+  sessionAffinity: None
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: camel-connect-webhook-vendor-a-service
+  namespace: kafka
+spec:
+  ports:
+    - name: webhook-vendor-a
+      port: 61003
+      protocol: TCP
+      targetPort: 61003
+  selector:
+    strimzi.io/cluster: camel-connect-cluster
+    strimzi.io/kind: KafkaConnect
+    strimzi.io/name: camel-connect-cluster-connect
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: camel-connect-webhook-vendor-b-events-service
+  namespace: kafka
+spec:
+  ports:
+    - name: webhook-vendor-b-events
+      port: 61004
+      protocol: TCP
+      targetPort: 61004
+  selector:
+    strimzi.io/cluster: camel-connect-cluster
+    strimzi.io/kind: KafkaConnect
+    strimzi.io/name: camel-connect-cluster-connect
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: camel-connect-webhook-vendor-b-telemetry-service
+  namespace: kafka
+spec:
+  ports:
+    - name: webhook-vendor-b-telemetry
+      port: 61005
+      protocol: TCP
+      targetPort: 61005
+  selector:
+    strimzi.io/cluster: camel-connect-cluster
+    strimzi.io/kind: KafkaConnect
+    strimzi.io/name: camel-connect-cluster-connect
+  type: ClusterIP
+---

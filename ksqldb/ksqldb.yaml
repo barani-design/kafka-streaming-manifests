@@ -1,0 +1,103 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ksqldb
+  namespace: kafka
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ksqldb
+  template:
+    metadata:
+      labels:
+        app: ksqldb
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: workload
+                    operator: In
+                    values:
+                      - kafka-stream
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    strimzi.io/kind: KafkaConnect
+                topologyKey: kubernetes.io/hostname
+              weight: 100
+      containers:
+        - env:
+            - name: KSQL_HOST_NAME
+              value: ksqldb
+            - name: KSQL_KSQL_SERVICE_ID
+              value: service-3
+            - name: KSQL_PROCESSING_GUARANTEE
+              value: exactly_once_v2
+            - name: KSQL_CONFLUENT_SUPPORT_METRICS_ENABLE
+              value: 'false'
+            - name: KSQL_BOOTSTRAP_SERVERS
+              value: kafka-kraft-kafka-bootstrap.kafka.svc:9092
+            - name: KSQL_SECURITY_PROTOCOL
+              value: SASL_PLAINTEXT
+            - name: KSQL_SASL_MECHANISM
+              value: SCRAM-SHA-512
+            - name: KSQL_SASL_JAAS_CONFIG
+              valueFrom:
+                secretKeyRef:
+                  key: sasl.jaas.config
+                  name: kafka-kraft-user
+            - name: KSQL_LISTENERS
+              value: http://0.0.0.0:8088
+            - name: KSQL_KSQL_SCHEMA_REGISTRY_URL
+              value: http://schema-registry.kafka.svc:8081
+            - name: KSQL_SCHEMA_REGISTRY_REGISTER_SCHEMAS
+              value: 'true'
+            - name: KSQL_PRODUCER_ACKS
+              value: all
+            - name: KSQL_PRODUCER_ENABLE_IDEMPOTENCE
+              value: 'true'
+            - name: KSQL_PRODUCER_DELIVERY_TIMEOUT_MS
+              value: '180000'
+            - name: KSQL_PRODUCER_MAX_IN_FLIGHT_REQUESTS_PER_CONNECTION
+              value: '1'
+            - name: KSQL_INTERNAL_TOPIC_REPLICAS
+              value: '3'
+            - name: KSQL_STREAMS_REPLICATION_FACTOR
+              value: '3'
+            - name: KSQL_NUM_STANDBY_REPLICAS
+              value: '1'
+            - name: KSQL_KSQL_INTERNAL_TOPIC_REPLICATION_FACTOR
+              value: '3'
+            - name: KSQL_CONSUMER_ISOLATION_LEVEL
+              value: read_committed
+            - name: KSQL_COMMIT_INTERVAL_MS
+              value: '10000'
+          image: confluentinc/cp-ksqldb-server:8.0.0
+          imagePullPolicy: IfNotPresent
+          name: ksqldb
+          ports:
+            - containerPort: 8088
+              name: http
+              protocol: TCP
+          resources:
+            limits:
+              cpu: 500m
+              memory: 1Gi
+            requests:
+              cpu: 500m
+              memory: 1Gi
+          volumeMounts:
+            - mountPath: /var/ksqldb
+              name: ksqldb-data
+              subPath: state
+      restartPolicy: Always
+      volumes:
+        - name: ksqldb-data
+          persistentVolumeClaim:
+            claimName: ksqldb-data-pvc
+

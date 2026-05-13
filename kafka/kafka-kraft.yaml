@@ -1,0 +1,112 @@
+apiVersion: kafka.strimzi.io/v1beta2
+kind: Kafka
+metadata:
+  annotations:
+    strimzi.io/kraft: enabled
+    strimzi.io/node-pools: enabled
+  name: kafka-kraft
+  namespace: kafka
+spec:
+  cruiseControl:
+    config:
+      concurrent.inter.broker.partition.movements: 2
+      concurrent.intra.broker.partition.movements: 5
+      concurrent.leader.movements: 20
+    livenessProbe:
+      initialDelaySeconds: 240
+      periodSeconds: 15
+    logging:
+      loggers:
+        rootLogger.level: INFO
+      type: inline
+    readinessProbe:
+      initialDelaySeconds: 240
+      periodSeconds: 15
+    resources:
+      limits:
+        cpu: '1'
+        memory: 2Gi
+      requests:
+        cpu: 500m
+        memory: 2Gi
+    template:
+      pod:
+        affinity:
+          nodeAffinity:
+            requiredDuringSchedulingIgnoredDuringExecution:
+              nodeSelectorTerms:
+                - matchExpressions:
+                    - key: workload
+                      operator: In
+                      values:
+                        - kafka-mgmt
+  entityOperator:
+    template:
+      pod:
+        affinity:
+          nodeAffinity:
+            requiredDuringSchedulingIgnoredDuringExecution:
+              nodeSelectorTerms:
+                - matchExpressions:
+                    - key: workload
+                      operator: In
+                      values:
+                        - kafka-mgmt
+    topicOperator:
+      resources:
+        limits:
+          cpu: 300m
+          memory: 512Mi
+        requests:
+          cpu: 300m
+          memory: 512Mi
+      watchedNamespace: kafka
+    userOperator:
+      resources:
+        limits:
+          cpu: 200m
+          memory: 256Mi
+        requests:
+          cpu: 200m
+          memory: 256Mi
+      watchedNamespace: kafka
+  kafka:
+    config:
+      allow.everyone.if.no.acl.found: false
+      auto.create.topics.enable: false
+      default.replication.factor: 5
+      delete.topic.enable: true
+      log.cleaner.enable: true
+      log.cleanup.policy: delete
+      log.retention.bytes: 524288000
+      log.segment.bytes: 104857600
+      min.insync.replicas: 3
+      offsets.topic.replication.factor: 5
+      transaction.state.log.min.isr: 3
+      transaction.state.log.replication.factor: 5
+      unclean.leader.election.enable: 'false'
+    listeners:
+      - authentication:
+          type: scram-sha-512
+        name: plain
+        port: 9092
+        tls: false
+        type: internal
+      - authentication:
+          type: scram-sha-512
+        name: external
+        port: 9094
+        tls: false
+        type: nodeport
+    template:
+      pod:
+        affinity:
+          nodeAffinity:
+            requiredDuringSchedulingIgnoredDuringExecution:
+              nodeSelectorTerms:
+                - matchExpressions:
+                    - key: workload
+                      operator: In
+                      values:
+                        - kafka-broker
+    version: 4.0.0

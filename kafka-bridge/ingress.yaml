@@ -1,0 +1,29 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    acme.cert-manager.io/http01-edit-in-place: 'true'
+    cert-manager.io/cluster-issuer: letsencrypt
+    cert-manager.io/issue-temporary-certificate: 'true'
+    nginx.ingress.kubernetes.io/auth-realm: Authentication Required - kafka-bridge
+    nginx.ingress.kubernetes.io/auth-secret: kafka-bridge-basic-auth
+    nginx.ingress.kubernetes.io/auth-type: basic
+  name: kafka-bridge
+  namespace: kafka
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: kafka-bridge.example.com
+      http:
+        paths:
+          - backend:
+              service:
+                name: kafka-bridge-bridge-service
+                port:
+                  number: 8087
+            path: /
+            pathType: Prefix
+  tls:
+    - hosts:
+        - kafka-bridge.example.com
+      secretName: kafka-bridge-tls

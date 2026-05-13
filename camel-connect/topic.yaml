@@ -1,0 +1,260 @@
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaTopic
+metadata:
+  name: external.lorawan.tti.region-a.raw.v1
+  namespace: kafka
+  labels: 
+    purpose: raw-json
+    strimzi.io/cluster: kafka-kraft
+spec:
+  partitions: 3
+  replicas: 3
+  config:
+    retention.ms: "604800000"
+    retention.bytes: "52428800"
+    segment.ms: "86400000"
+    segment.bytes: "10485760"
+    cleanup.policy: "delete"
+    compression.type: "zstd"
+    max.message.bytes: "104857"
+---
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaTopic
+metadata:
+  name: external.lorawan.tti.region-b.raw.v1
+  namespace: kafka
+  labels:
+    purpose: raw-json
+    strimzi.io/cluster: kafka-kraft
+spec:
+  partitions: 3
+  replicas: 3
+  config:
+    retention.ms: "604800000"
+    retention.bytes: "314572800"
+    segment.ms: "86400000"
+    segment.bytes: "62914560"
+    cleanup.policy: "delete"
+    compression.type: "zstd"
+    max.message.bytes: "104857"
+---
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaTopic
+metadata: 
+  name: external.lorawan.tti.region-c.raw.v1
+  namespace: kafka
+  labels:
+    purpose: raw-json
+    strimzi.io/cluster: kafka-kraft
+spec:
+  partitions: 3
+  replicas: 3
+  config:
+    retention.ms: "604800000"
+    retention.bytes: "52428800"
+    segment.ms: "86400000"
+    segment.bytes: "10485760"
+    cleanup.policy: "delete"
+    compression.type: "zstd"
+    max.message.bytes: "104857"
+---
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaTopic
+metadata:
+  name: external.iot.vendor-a.raw.v1
+  namespace: kafka
+  labels:
+    purpose: raw-json
+    strimzi.io/cluster: kafka-kraft
+spec:
+  partitions: 3
+  replicas: 3
+  config:
+    retention.ms: "604800000"
+    retention.bytes: "52428800"
+    segment.ms: "86400000"
+    segment.bytes: "10485760"
+    cleanup.policy: "delete"
+    compression.type: "zstd"
+    max.message.bytes: "104857"
+---
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaTopic
+metadata:
+  name: external.iot.vendor-b.events.raw.v1
+  namespace: kafka
+  labels:
+    purpose: raw-json
+    strimzi.io/cluster: kafka-kraft
+spec:
+  partitions: 3
+  replicas: 3
+  config:
+    retention.ms: "604800000"
+    retention.bytes: "52428800"
+    segment.ms: "86400000"
+    segment.bytes: "10485760"
+    cleanup.policy: "delete"
+    compression.type: "zstd"
+    max.message.bytes: "104857"
+---
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaTopic
+metadata:
+  name: external.iot.vendor-b.telemetry.raw.v1
+  namespace: kafka
+  labels:
+    purpose: raw-json
+    strimzi.io/cluster: kafka-kraft
+spec:
+  partitions: 3
+  replicas: 3
+  config:
+    retention.ms: "604800000"
+    retention.bytes: "52428800"
+    segment.ms: "86400000"
+    segment.bytes: "10485760"
+    cleanup.policy: "delete"
+    compression.type: "zstd"
+    max.message.bytes: "104857"
+---
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaTopic
+metadata:
+  name: internal.lorawan.tti.aggregate.stage00.v1
+  namespace: kafka
+  labels: 
+    purpose: staging
+    strimzi.io/cluster: kafka-kraft
+spec:
+  partitions: 3
+  replicas: 3
+  config:
+    retention.ms: "604800000"
+    retention.bytes: "314572800"
+    segment.ms: "86400000"
+    segment.bytes: "62914560"
+    cleanup.policy: "compact,delete"
+    compression.type: "zstd"
+    max.message.bytes: "104857"
+---
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaTopic
+metadata:
+  name: internal.lorawan.tti.envelope.stage01.v1
+  namespace: kafka
+  labels: 
+    purpose: staging
+    strimzi.io/cluster: kafka-kraft
+spec:
+  partitions: 3
+  replicas: 3
+  config:
+    retention.ms: "604800000"
+    retention.bytes: "314572800"
+    segment.ms: "86400000"
+    segment.bytes: "62914560"
+    cleanup.policy: "compact,delete"
+    compression.type: "zstd"
+    max.message.bytes: "104857"
+---
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaTopic
+metadata:
+  name: internal.lorawan.tti.telemetry.stage02.v1
+  namespace: kafka
+  labels: 
+    purpose: staging
+    strimzi.io/cluster: kafka-kraft
+spec:
+  partitions: 3
+  replicas: 3
+  config:
+    retention.ms: "604800000"
+    retention.bytes: "314572800"
+    segment.ms: "86400000"
+    segment.bytes: "62914560"
+    cleanup.policy: "compact,delete"
+    compression.type: "zstd"
+    max.message.bytes: "104857"
+---
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaTopic
+metadata:
+  name: internal.lorawan.tti.service.stage02.v1
+  namespace: kafka
+  labels: 
+    purpose: final
+    strimzi.io/cluster: kafka-kraft
+spec:
+  partitions: 3
+  replicas: 3
+  config:
+    retention.ms: "604800000"
+    retention.bytes: "15728640"
+    segment.ms: "86400000"
+    segment.bytes: "5242880"
+    cleanup.policy: "compact,delete"
+    compression.type: "zstd"
+    max.message.bytes: "104857"
+---
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaTopic
+metadata:
+  name: internal.lorawan.tti.telemetry.stage03.v1
+  namespace: kafka
+  labels: 
+    purpose: staging
+    strimzi.io/cluster: kafka-kraft
+spec:
+  partitions: 3
+  replicas: 3
+  config:
+    retention.ms: "604800000"
+    retention.bytes: "314572800"
+    segment.ms: "86400000"
+    segment.bytes: "62914560"
+    cleanup.policy: "compact,delete"
+    compression.type: "zstd"
+    max.message.bytes: "104857"
+---
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaTopic
+metadata:
+  name: internal.lorawan.tti.telemetry.stage04.v1
+  namespace: kafka
+  labels: 
+    purpose: final
+    strimzi.io/cluster: kafka-kraft
+spec:
+  partitions: 3
+  replicas: 3
+  config:
+    retention.ms: "604800000"
+    retention.bytes: "314572800"
+    segment.ms: "86400000"
+    segment.bytes: "62914560"
+    cleanup.policy: "compact,delete"
+    compression.type: "zstd"
+    max.message.bytes: "104857"
+---
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaTopic
+metadata:
+  name: internal.lorawan.dlq.v1
+  namespace: kafka
+  labels: 
+    purpose: dlq
+    strimzi.io/cluster: kafka-kraft
+spec:
+  partitions: 3
+  replicas: 3
+  config:
+    retention.ms: "604800000"
+    retention.bytes: "15728640"
+    segment.ms: "86400000"
+    segment.bytes: "5242880"
+    cleanup.policy: "compact,delete"
+    compression.type: "zstd"
+    max.message.bytes: "104857"
+---

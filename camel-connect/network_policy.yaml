@@ -1,0 +1,29 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: camel-netty-webhook-ports
+  namespace: kafka
+spec:
+  podSelector:
+    matchLabels:
+      strimzi.io/cluster: camel-connect-cluster
+      strimzi.io/kind: KafkaConnect
+      strimzi.io/name: camel-connect-cluster-connect
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - namespaceSelector: {}
+      ports:
+        - protocol: TCP
+          port: 61000
+        - protocol: TCP
+          port: 61001
+        - protocol: TCP
+          port: 61002
+        - protocol: TCP
+          port: 61003
+        - protocol: TCP
+          port: 61004
+        - protocol: TCP
+          port: 61005

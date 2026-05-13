@@ -1,0 +1,43 @@
+@startuml
+skinparam linetype ortho
+skinparam defaultTextAlignment center
+left to right direction
+
+package "Webhooks" {
+    [webhook-lorawan-tti-region-a\nPort: 61000\nURL: https://camel-connect-webhook.example.com/webhook-lorawan-tti-region-a]
+    [webhook-lorawan-tti-region-b\nPort: 61001\nURL: https://camel-connect-webhook.example.com/webhook-lorawan-tti-region-b]
+    [webhook-lorawan-tti-region-c\nPort: 61002\nURL: https://camel-connect-webhook.example.com/webhook-lorawan-tti-region-c]
+    [webhook-vendor-a\nPort: 61003\nURL: https://camel-connect-webhook.example.com/webhook-vendor-a]
+    [webhook-vendor-b-events\nPort: 61004\nURL: https://camel-connect-webhook-vendor-b.example.com/webhook-vendor-b-events]
+    [webhook-vendor-b-telemetry\nPort: 61005\nURL: https://camel-connect-webhook-vendor-b.example.com/webhook-vendor-b-telemetry]
+}
+
+package "Topics" {
+    [external.lorawan.tti.region-a.raw.v1]
+    [external.lorawan.tti.region-b.raw.v1]
+    [external.lorawan.tti.region-c.raw.v1]
+    [external.iot.vendor-a.raw.v1]
+    [external.iot.vendor-b.events.raw.v1]
+    [external.iot.vendor-b.telemetry.raw.v1]
+}
+
+[Ingress\ncamel-connect-webhook] --> [Service\nper-webhook Services\nPorts: 61000-61005]
+[Service\nper-webhook Services\nPorts: 61000-61005] --> [NetworkPolicy\ncamel-netty-webhook-ports\nPorts: 61000-61005]
+[NetworkPolicy\ncamel-netty-webhook-ports\nPorts: 61000-61005] --> [Kafka Connector\ncamel-connect-cluster-connect\nPorts: 61000-61005]
+[Kafka Connector\ncamel-connect-cluster-connect\nPorts: 61000-61005] --> [Kafka Connect\ncamel-connect-cluster]
+
+[Kafka Connect\ncamel-connect-cluster] --> [external.lorawan.tti.region-a.raw.v1]
+[Kafka Connect\ncamel-connect-cluster] --> [external.lorawan.tti.region-b.raw.v1]
+[Kafka Connect\ncamel-connect-cluster] --> [external.lorawan.tti.region-c.raw.v1]
+[Kafka Connect\ncamel-connect-cluster] --> [external.iot.vendor-a.raw.v1]
+[Kafka Connect\ncamel-connect-cluster] --> [external.iot.vendor-b.events.raw.v1]
+[Kafka Connect\ncamel-connect-cluster] --> [external.iot.vendor-b.telemetry.raw.v1]
+
+[webhook-lorawan-tti-region-a\nPort: 61000\nURL: https://camel-connect-webhook.example.com/webhook-lorawan-tti-region-a] --> [Ingress\ncamel-connect-webhook]
+[webhook-lorawan-tti-region-b\nPort: 61001\nURL: https://camel-connect-webhook.example.com/webhook-lorawan-tti-region-b] --> [Ingress\ncamel-connect-webhook]
+[webhook-lorawan-tti-region-c\nPort: 61002\nURL: https://camel-connect-webhook.example.com/webhook-lorawan-tti-region-c] --> [Ingress\ncamel-connect-webhook]
+[webhook-vendor-a\nPort: 61003\nURL: https://camel-connect-webhook.example.com/webhook-vendor-a] --> [Ingress\ncamel-connect-webhook]
+[webhook-vendor-b-events\nPort: 61004\nURL: https://camel-connect-webhook-vendor-b.example.com/webhook-vendor-b-events] --> [Ingress\ncamel-connect-webhook]
+[webhook-vendor-b-telemetry\nPort: 61005\nURL: https://camel-connect-webhook-vendor-b.example.com/webhook-vendor-b-telemetry] --> [Ingress\ncamel-connect-webhook]
+
+@enduml

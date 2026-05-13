@@ -1,0 +1,26 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: webhook-logger
+  namespace: kafka
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt"
+    acme.cert-manager.io/http01-edit-in-place: 'true'
+    cert-manager.io/issue-temporary-certificate: 'true'
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: camel-connect-webhook-logger.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: webhook-logger
+                port:
+                  number: 8080
+  tls:
+    - hosts:
+        - camel-connect-webhook-logger.example.com
+      secretName: camel-connect-webhook-logger-tls

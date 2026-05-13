@@ -1,0 +1,32 @@
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaConnector
+metadata:
+  name: debezium.source.jdbc.pgsql.sampledb.raw.v1
+  namespace: kafka
+  labels:
+    strimzi.io/cluster: debezium-connect-cluster
+spec:
+  class: io.debezium.connector.postgresql.PostgresConnector
+  config:
+    database.dbname: sampledb
+    database.hostname: postgres.example.internal
+    database.password: ${secrets:postgres-source-credentials:DB_PASSWORD}
+    database.port: 5432
+    database.user: ${secrets:postgres-source-credentials:DB_USERNAME}
+    plugin.name: pgoutput
+    publication.name: sample_publication
+    schema.include.list: public
+    slot.name: sample_slot
+    snapshot.mode: always
+    table.include.list: public.sample_table_a,public.sample_table_b
+    topic.prefix: debezium
+    transforms: unwrap,toKey,extractKey
+    transforms.extractKey.field: id
+    transforms.extractKey.skip.missing.or.null: 'true'
+    transforms.extractKey.type: org.apache.kafka.connect.transforms.ExtractField$Key
+    transforms.toKey.fields: id
+    transforms.toKey.type: org.apache.kafka.connect.transforms.ValueToKey
+    transforms.unwrap.delete.handling.mode: drop
+    transforms.unwrap.drop.tombstones: 'true'
+    transforms.unwrap.type: io.debezium.transforms.ExtractNewRecordState
+  tasksMax: 1

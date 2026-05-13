@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ksqldb-cli
+  namespace: kafka
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ksqldb-cli
+  template:
+    metadata:
+      labels:
+        app: ksqldb-cli
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: workload
+                    operator: In
+                    values:
+                      - kafka-stream
+      containers:
+        - args:
+            - >
+              # Keep the container alive so you can exec in when needed.
+
+              echo "ksqldb-cli ready - exec with 'kubectl exec -it <pod> -- ksql http://ksqldb.kafka.svc:8088'";
+
+              tail -f /dev/null
+          command:
+            - /bin/sh
+            - '-c'
+          image: confluentinc/cp-ksqldb-cli:8.0.0
+          imagePullPolicy: IfNotPresent
+          name: ksqldb-cli
+          resources:
+            limits:
+              cpu: 750m
+              memory: 2Gi
+            requests:
+              cpu: 100m
+              memory: 128Mi
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          tty: true
+      restartPolicy: Always

@@ -1,0 +1,86 @@
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaConnect
+metadata:
+  annotations:
+    strimzi.io/use-connector-resources: 'true'
+  name: camel-connect-cluster
+  namespace: kafka
+spec:
+  authentication:
+    passwordSecret:
+      password: password
+      secretName: kafka-kraft-user
+    type: scram-sha-512
+    username: kafka-kraft-user
+  bootstrapServers: kafka-kraft-kafka-bootstrap.kafka.svc:9092
+  build:
+    output:
+      image: ghcr.io/example/camel-connect-cluster:latest
+      type: docker
+    plugins:
+      - artifacts:
+          - type: tgz
+            url: >-
+              https://repo.maven.apache.org/maven2/org/apache/camel/kafkaconnector/camel-netty-http-kafka-connector/4.11.0/camel-netty-http-kafka-connector-4.11.0-package.tar.gz
+        name: camel-netty-http-kafka-connector
+  config:
+    config.storage.partitions: 3
+    config.storage.replication.factor: 5
+    config.storage.topic: camel-connect-configs
+    group.id: camel-connect-cluster
+    key.converter: org.apache.kafka.connect.converters.ByteArrayConverter
+    key.converter.schemas.enable: 'false'
+    offset.storage.partitions: 6
+    offset.storage.replication.factor: 5
+    offset.storage.topic: camel-connect-offsets
+    producer.acks: all
+    producer.delivery.timeout.ms: 180000
+    producer.enable.idempotence: true
+    producer.max.in.flight.requests.per.connection: 1
+    status.storage.partitions: 3
+    status.storage.replication.factor: 5
+    status.storage.topic: camel-connect-status
+    tasks.shutdown.graceful.timeout.ms: '1000'
+    topic.creation.enable: 'false'
+    value.converter: org.apache.kafka.connect.converters.ByteArrayConverter
+    value.converter.schemas.enable: 'false'
+  livenessProbe:
+    failureThreshold: 12
+    initialDelaySeconds: 90
+    periodSeconds: 10
+    timeoutSeconds: 5
+  logging:
+    loggers:
+      log4j.logger.org.apache.camel.component.netty.http: INFO
+      log4j.logger.org.apache.camel.kafkaconnector: INFO
+    type: inline
+  readinessProbe:
+    failureThreshold: 12
+    initialDelaySeconds: 45
+    periodSeconds: 10
+    timeoutSeconds: 5
+  replicas: 1
+  resources:
+    limits:
+      cpu: '1'
+      memory: 2048Mi
+    requests:
+      cpu: 500m
+      memory: 2048Mi
+  template:
+    connectContainer:
+      env:
+        - name: JAVA_TOOL_OPTIONS
+          value: '-Djdk.net.preferIPv4Stack=true'
+    pod:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: workload
+                    operator: In
+                    values:
+                      - kafka-stream
+  version: 4.0.0
+

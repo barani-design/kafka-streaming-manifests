@@ -1,0 +1,163 @@
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaConnector
+metadata:
+  labels:
+    strimzi.io/cluster: camel-connect-cluster
+  name: camelnettyhttp.source.lorawan.tti.region-a.raw.v1
+  namespace: kafka
+spec:
+  class: org.apache.camel.kafkaconnector.nettyhttp.CamelNettyhttpSourceConnector
+  config:
+    camel.source.path.host: 0.0.0.0
+    camel.source.path.path: webhook-lorawan-tti-region-a
+    camel.source.path.port: 61000
+    camel.source.path.protocol: http
+    errors.log.enable: 'true'
+    errors.log.include.headers: 'true'
+    errors.log.include.messages: 'true'
+    errors.tolerance: all
+    topics: external.lorawan.tti.region-a.raw.v1
+    transforms: tostring
+    transforms.tostring.target.type: java.lang.String
+    transforms.tostring.type: >-
+      org.apache.camel.kafkaconnector.transforms.CamelTypeConverterTransform$Value
+    value.converter: org.apache.kafka.connect.storage.StringConverter
+    value.converter.schemas.enable: false
+  tasksMax: 1
+---
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaConnector
+metadata:
+  labels:
+    strimzi.io/cluster: camel-connect-cluster
+  name: camelnettyhttp.source.lorawan.tti.region-b.raw.v1
+  namespace: kafka
+spec:
+  class: org.apache.camel.kafkaconnector.nettyhttp.CamelNettyhttpSourceConnector
+  config:
+    camel.source.path.host: 0.0.0.0
+    camel.source.path.path: webhook-lorawan-tti-region-b
+    camel.source.path.port: 61001
+    camel.source.path.protocol: http
+    errors.log.enable: 'true'
+    errors.log.include.headers: 'true'
+    errors.log.include.messages: 'true'
+    errors.tolerance: all
+    topics: external.lorawan.tti.region-b.raw.v1
+    transforms: tostring
+    transforms.tostring.target.type: java.lang.String
+    transforms.tostring.type: >-
+      org.apache.camel.kafkaconnector.transforms.CamelTypeConverterTransform$Value
+    value.converter: org.apache.kafka.connect.storage.StringConverter
+    value.converter.schemas.enable: false
+  tasksMax: 1
+---
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaConnector
+metadata:
+  labels:
+    strimzi.io/cluster: camel-connect-cluster
+  name: camelnettyhttp.source.lorawan.tti.region-c.raw.v1
+  namespace: kafka
+spec:
+  class: org.apache.camel.kafkaconnector.nettyhttp.CamelNettyhttpSourceConnector
+  config:
+    camel.source.path.host: 0.0.0.0
+    camel.source.path.path: webhook-lorawan-tti-region-c
+    camel.source.path.port: 61002
+    camel.source.path.protocol: http
+    errors.log.enable: 'true'
+    errors.log.include.headers: 'true'
+    errors.log.include.messages: 'true'
+    errors.tolerance: all
+    topics: external.lorawan.tti.region-c.raw.v1
+    transforms: tostring
+    transforms.tostring.target.type: java.lang.String
+    transforms.tostring.type: >-
+      org.apache.camel.kafkaconnector.transforms.CamelTypeConverterTransform$Value
+    value.converter: org.apache.kafka.connect.storage.StringConverter
+    value.converter.schemas.enable: false
+  tasksMax: 1
+---
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaConnector
+metadata:
+  labels:
+    strimzi.io/cluster: camel-connect-cluster
+  name: camelnettyhttp.source.iot.vendor-a.raw.v1
+  namespace: kafka
+spec:
+  class: org.apache.camel.kafkaconnector.nettyhttp.CamelNettyhttpSourceConnector
+  config:
+    camel.source.path.host: 0.0.0.0
+    camel.source.path.path: webhook-vendor-a
+    camel.source.path.port: 61003
+    camel.source.path.protocol: http
+    errors.log.enable: 'true'
+    errors.log.include.headers: 'true'
+    errors.log.include.messages: 'true'
+    errors.tolerance: all
+    topics: external.iot.vendor-a.raw.v1
+    transforms: tostring
+    transforms.tostring.target.type: java.lang.String
+    transforms.tostring.type: >-
+      org.apache.camel.kafkaconnector.transforms.CamelTypeConverterTransform$Value
+    value.converter: org.apache.kafka.connect.storage.StringConverter
+    value.converter.schemas.enable: 'false'
+  tasksMax: 1
+---
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaConnector
+metadata:
+  labels:
+    strimzi.io/cluster: camel-connect-cluster
+  name: camelnettyhttp.source.iot.vendor-b.events.raw.v1
+  namespace: kafka
+spec:
+  class: org.apache.camel.kafkaconnector.nettyhttp.CamelNettyhttpSourceConnector
+  config:
+    camel.source.endpoint.parameters.sync: 'true'
+    camel.source.path.host: 0.0.0.0
+    camel.source.path.path: webhook-vendor-b-events
+    camel.source.path.port: 61004
+    camel.source.path.protocol: http
+    errors.log.enable: 'true'
+    errors.log.include.headers: 'true'
+    errors.log.include.messages: 'true'
+    errors.tolerance: all
+    topics: external.iot.vendor-b.events.raw.v1
+    transforms: tostring
+    transforms.tostring.target.type: java.lang.String
+    transforms.tostring.type: >-
+      org.apache.camel.kafkaconnector.transforms.CamelTypeConverterTransform$Value
+    value.converter: org.apache.kafka.connect.storage.StringConverter
+    value.converter.schemas.enable: 'false'
+  tasksMax: 1
+---
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaConnector
+metadata:
+  labels:
+    strimzi.io/cluster: camel-connect-cluster
+  name: camelnettyhttp.source.iot.vendor-b.telemetry.raw.v1
+  namespace: kafka
+spec:
+  class: org.apache.camel.kafkaconnector.nettyhttp.CamelNettyhttpSourceConnector
+  config:
+    camel.source.endpoint.parameters.sync: 'true'
+    camel.source.path.host: 0.0.0.0
+    camel.source.path.path: webhook-vendor-b-telemetry
+    camel.source.path.port: 61005
+    camel.source.path.protocol: http
+    errors.log.enable: 'true'
+    errors.log.include.headers: 'true'
+    errors.log.include.messages: 'true'
+    errors.tolerance: all
+    topics: external.iot.vendor-b.telemetry.raw.v1
+    transforms: tostring
+    transforms.tostring.target.type: java.lang.String
+    transforms.tostring.type: >-
+      org.apache.camel.kafkaconnector.transforms.CamelTypeConverterTransform$Value
+    value.converter: org.apache.kafka.connect.storage.StringConverter
+    value.converter.schemas.enable: 'false'
+  tasksMax: 1

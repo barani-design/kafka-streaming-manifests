@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: webhook-logger
+  namespace: kafka
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: webhook-logger
+  template:
+    metadata:
+      labels:
+        app: webhook-logger
+    spec:
+      containers:
+        - name: logger
+          image: mendhak/http-https-echo:latest
+          ports:
+            - containerPort: 8080
+          resources:
+            limits:
+              memory: "128Mi"
+              cpu: "200m"
+            requests:
+              memory: "64Mi"
+              cpu: "100m"

@@ -1,0 +1,73 @@
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaConnect
+metadata:
+  name: debezium-connect-cluster
+  namespace: kafka
+  annotations:
+    strimzi.io/use-connector-resources: "true"
+spec:
+  authentication:
+    passwordSecret:
+      password: password
+      secretName: kafka-kraft-user
+    type: scram-sha-512
+    username: kafka-kraft-user
+  bootstrapServers: kafka-kraft-kafka-bootstrap.kafka.svc:9092
+  build:
+    output:
+      image: ghcr.io/example/debezium-connect-cluster:latest
+      type: docker
+    plugins:
+      - artifacts:
+          - type: tgz
+            url: >-
+              https://repo1.maven.org/maven2/io/debezium/debezium-connector-postgres/3.2.0.Final/debezium-connector-postgres-3.2.0.Final-plugin.tar.gz
+        name: debezium-postgres-connector
+  config:
+    config.providers: secrets
+    config.providers.secrets.class: io.strimzi.kafka.KubernetesSecretConfigProvider
+    config.storage.partitions: 3
+    config.storage.replication.factor: 5
+    config.storage.topic: debezium-connect-configs
+    group.id: debezium-connect-cluster
+    offset.storage.partitions: 6
+    offset.storage.replication.factor: 5
+    offset.storage.topic: debezium-connect-offsets
+    producer.acks: all
+    producer.delivery.timeout.ms: 180000
+    producer.enable.idempotence: true
+    producer.max.in.flight.requests.per.connection: 1
+    status.storage.partitions: 3
+    status.storage.replication.factor: 5
+    status.storage.topic: debezium-connect-status
+  livenessProbe:
+    failureThreshold: 12
+    initialDelaySeconds: 180
+    periodSeconds: 10
+    timeoutSeconds: 5
+  readinessProbe:
+    failureThreshold: 12
+    initialDelaySeconds: 90
+    periodSeconds: 10
+    timeoutSeconds: 5
+  replicas: 1
+  resources:
+    limits:
+      cpu: 500m
+      memory: 1Gi
+    requests:
+      cpu: 250m
+      memory: 500Mi
+  template:
+    pod:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: workload
+                    operator: In
+                    values:
+                      - kafka-stream
+  version: 4.0.0
+  
